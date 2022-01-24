@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Rest_API_Profiles_Users;
 using Rest_API_Profiles_Users.Data;
+using System.Web.Helpers;
+
 
 namespace Rest_API_Profiles_Users.Controllers
 {
@@ -37,7 +39,7 @@ namespace Rest_API_Profiles_Users.Controllers
             
             user.Id = createdUser.Id;
             user.UserName = createdUser.UserName;
-            user.Password = createdUser.Password;
+            user.Password = Crypto.HashPassword(createdUser.Password);
             user.Profile = profile;
             user.IdEmployee = createdUser.IdEmployee;
             user.Status = createdUser.Status;
@@ -76,19 +78,24 @@ namespace Rest_API_Profiles_Users.Controllers
             if (id != editedUser.Id)
                 return BadRequest($"Different Ids {id} != {editedUser.Id}");
 
-            User user = await _context.Users.FindAsync(editedUser.Id);
-            
+            User user = await _context.Users.Include(x => x.Profile).FirstOrDefaultAsync(x => x.Id == id);
+
+
             if (user == null)
                 return NotFound($"User with Id {editedUser.Id} was not found");
             
             if (editedUser.ProfileId != user.Profile.Id)
             {
                 Profile profile = await _context.Profiles.FindAsync(editedUser.ProfileId);
+                if (profile == null)
+                    return NotFound($"Profile with id {editedUser.ProfileId} was not found");
                 user.Profile = profile;
             }
 
+            if (user.Password != editedUser.Password)
+                user.Password = Crypto.HashPassword(editedUser.Password);
+
             user.UserName = editedUser.UserName;
-            user.Password = editedUser.Password;
             user.IdEmployee = editedUser.IdEmployee;
             user.Status = editedUser.Status;
             user.UpdateDate = DateTime.Now;
