@@ -102,7 +102,7 @@ namespace Rest_API_Profiles_Users.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UserExists(id))
+                if (!_context.Users.Any(e => e.Id == id))
                 {
                     return NotFound();
                 }
@@ -115,9 +115,6 @@ namespace Rest_API_Profiles_Users.Controllers
             return NoContent();
         }
 
-        
-
-        // DELETE: api/Users/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
@@ -132,10 +129,6 @@ namespace Rest_API_Profiles_Users.Controllers
 
             return NoContent();
         }
-
-        private bool UserExists(int id)
-        {
-            return _context.Users.Any(e => e.Id == id);
-        }
+        
     }
 }
