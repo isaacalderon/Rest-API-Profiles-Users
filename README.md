@@ -64,3 +64,17 @@ Body Example:
 
 ### Delete Users
 DELETE /api/Users/{id}
+
+# Test REST API
+Environment: Ubuntu
+Prerequisites: Ubuntu, Docker
+
+In Ubuntu use the following commands 
+```
+git clone https://github.com/isaacalderon/Rest-API-Profiles-Users
+cd Rest-API-Profiles-Users
+docker build . -t restapi:basic
+docker run -it -p 8000:80 -e ASPNETCORE_ENVIRONMENT=Development restapi:basic
+```
+Now you can test the API with postman at localhost:8000 or simply going to http://localhost:8000/swagger/index.html
+
